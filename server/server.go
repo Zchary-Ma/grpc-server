@@ -4,37 +4,80 @@ import (
 	"context"
 	"github.com/zchary-ma/pre/pb"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"net"
+	"time"
 )
 
-type server struct {
+type Server struct {
 	pb.UnimplementedNoteServiceServer
-	NoteMap map[string]*pb.Note
 }
 
-func (s server) GetNote(ctx context.Context, set *pb.IdSet) (*pb.NoteList, error) {
-	panic("implement me")
+var NoteMap map[string]*pb.Note
+
+func NewServer() *Server {
+	var s = &Server{}
+	t := time.Now()
+	NoteMap = map[string]*pb.Note{
+		"1": {
+			Id:    "1",
+			Title: "note1",
+			Contents: []*pb.Note_Content{
+				{
+					Type: pb.Note_Content_TEXT,
+					Text: "text1",
+				},
+			},
+			CreatedAt: timestamppb.New(t), // NOTE timezone? not match with time.Now()
+			UpdatedAt: timestamppb.New(t.Add(time.Hour * 10)),
+		},
+		"2": {
+			Id:    "2",
+			Title: "note2",
+			Contents: []*pb.Note_Content{
+				{
+					Type: pb.Note_Content_TEXT,
+					Text: "text2",
+				},
+			},
+			CreatedAt: timestamppb.New(t),
+			UpdatedAt: timestamppb.New(t.Add(time.Hour * 10)),
+		},
+	}
+	return s
 }
 
-func (s server) CreateNote(ctx context.Context, note *pb.Note) (*pb.Note, error) {
-	panic("implement me")
+func (s Server) GetNote(ctx context.Context, set *pb.IdSet) (*pb.NoteList, error) {
+	var list = &pb.NoteList{}
+	for _, id := range set.Ids {
+		list.Notes = append(list.Notes, NoteMap[id])
+	}
+	return list, nil
 }
 
-func (s server) UpdateNote(ctx context.Context, note *pb.Note) (*pb.Note, error) {
-	panic("implement me")
+func (s Server) CreateNote(ctx context.Context, note *pb.Note) (*pb.Note, error) {
+	NoteMap[note.Id] = note
+	return note, nil
 }
 
-func (s server) DeleteNote(ctx context.Context, set *pb.IdSet) (*pb.IdSet, error) {
-	panic("implement me")
+func (s Server) UpdateNote(ctx context.Context, note *pb.Note) (*pb.Note, error) {
+	NoteMap[note.Id] = note
+	return note, nil
 }
 
-func ListenAndServe(port string) error {
+func (s Server) DeleteNote(ctx context.Context, set *pb.IdSet) (*pb.IdSet, error) {
+	for _, id := range set.Ids {
+		delete(NoteMap, id)
+	}
+	return set, nil
+}
+
+func (s *Server) ListenAndServe(port string) error {
 	listener, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		return err
 	}
-	s := grpc.NewServer()
-	pb.RegisterNoteServiceServer(s, server{})
-
-	return s.Serve(listener)
+	srv := grpc.NewServer()
+	pb.RegisterNoteServiceServer(srv, Server{})
+	return srv.Serve(listener)
 }
