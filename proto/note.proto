@@ -1,0 +1,56 @@
+syntax="proto3";
+
+package pb;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package="github.com/zchary-ma/pre/pb";
+
+message Note {
+  string id = 1;
+  string title = 2;
+  message Content {
+    string text = 1;
+    enum Type {
+      TEXT = 0;
+      IMAGE = 1;
+    }
+    Type type = 2;
+  }
+  repeated Content Contents = 3;
+  google.protobuf.Timestamp created_at = 4;
+  google.protobuf.Timestamp updated_at = 5;
+}
+
+message NoteList {
+  repeated Note Notes = 1;
+}
+
+message IdSet {
+  repeated string ids = 1;
+}
+
+message Id {
+  string id = 1;
+}
+
+message User {
+    string id = 1;
+    string name = 2;
+    string email = 3;
+    string pwd = 4;
+}
+
+service NoteService {
+  rpc GetNote(IdSet) returns (NoteList);
+  rpc CreateNote(Note) returns (Note);
+  rpc UpdateNote(Note) returns (Note);
+  rpc DeleteNote(IdSet) returns (IdSet);
+}
+
+service UserService {
+  rpc GetUser(Id) returns (User);
+  rpc CreateUser(User) returns (User);
+  rpc UpdateUser(User) returns (Id);
+  rpc DeleteUser(Id) returns (User);
+}
