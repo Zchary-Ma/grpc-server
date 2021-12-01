@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"github.com/google/uuid"
 	pb "github.com/zchary-ma/grpc-server/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -57,9 +58,10 @@ func (s Server) GetNote(ctx context.Context, set *pb.IdSet) (*pb.NoteList, error
 }
 
 func (s Server) CreateNote(ctx context.Context, note *pb.Note) (*pb.Id, error) {
-	var id = &pb.Id{Id: "xxx"}
-	NoteMap[id.String()] = note
-	return id, nil
+	id := uuid.NewString()
+	note.Id = id
+	NoteMap[id] = note
+	return &pb.Id{Id: id}, nil
 }
 
 func (s Server) UpdateNote(ctx context.Context, note *pb.Note) (*pb.Note, error) {

@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"github.com/golang/mock/gomock"
+	"github.com/google/uuid"
 	"github.com/zchary-ma/grpc-server/mock"
 	pb "github.com/zchary-ma/grpc-server/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -11,8 +12,12 @@ import (
 	"time"
 )
 
+var (
+	id        = uuid.NewString()
+	startTime = time.Now()
+)
+
 func TestServer_CreateNote(t *testing.T) {
-	startTime := time.Now()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish() // as
 
@@ -21,7 +26,7 @@ func TestServer_CreateNote(t *testing.T) {
 
 	// req
 	req := &pb.Note{
-		Id:    "3",
+		Id:    id,
 		Title: "test note",
 		Contents: []*pb.Note_Content{
 			{
@@ -33,18 +38,8 @@ func TestServer_CreateNote(t *testing.T) {
 		UpdatedAt: timestamppb.New(startTime.Add(time.Hour * 2)),
 	}
 
-	mockNoteClient.EXPECT().CreateNote(gomock.Any(), req).Return(&pb.Note{
-		Id:    "3",
-		Title: "test note",
-		Contents: []*pb.Note_Content{
-			{
-				Type: pb.Note_Content_TEXT,
-				Text: "test note",
-			},
-		},
-		CreatedAt: timestamppb.New(startTime),
-		UpdatedAt: timestamppb.New(startTime.Add(time.Hour * 2)),
-	}, nil)
+	mockNoteClient.EXPECT().CreateNote(
+		gomock.Any(), req).Return(&pb.Id{Id: id}, nil)
 
 	// conn, err := grpc.Dial("50051", grpc.WithInsecure())
 	// if err != nil {
@@ -62,7 +57,7 @@ func testserverCreateNote(t *testing.T, client pb.NoteServiceClient) {
 	defer canncel()
 
 	note := pb.Note{
-		Id:    "3",
+		Id:    id,
 		Title: "test note",
 		Contents: []*pb.Note_Content{
 			{
@@ -70,17 +65,13 @@ func testserverCreateNote(t *testing.T, client pb.NoteServiceClient) {
 				Text: "test note",
 			},
 		},
+		CreatedAt: timestamppb.New(startTime),
+		UpdatedAt: timestamppb.New(startTime.Add(time.Hour * 2)),
 	}
 
 	r, err := client.CreateNote(ctx, &note)
 	if err != nil {
 		t.Errorf("CreateNote() error = %v", err)
 	}
-
-	if r.Id != "3" {
-		t.Errorf("CreateNote() error = %v", err)
-	}
-
 	log.Printf("Recv: %v\n", r)
-
 }
