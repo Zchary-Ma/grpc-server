@@ -1,10 +1,10 @@
-syntax="proto3";
+syntax = "proto3";
 
-package pb;
+package proto;
 
 import "google/protobuf/timestamp.proto";
 
-option go_package="github.com/zchary-ma/pre/pb";
+option go_package = "github.com/zchary-ma/grpc-server/proto";
 
 message Note {
   string id = 1;
@@ -35,15 +35,15 @@ message Id {
 }
 
 message User {
-    string id = 1;
-    string name = 2;
-    string email = 3;
-    string pwd = 4;
+  string id = 1;
+  string name = 2;
+  string email = 3;
+  string pwd = 4;
 }
 
 service NoteService {
   rpc GetNote(IdSet) returns (NoteList);
-  rpc CreateNote(Note) returns (Note);
+  rpc CreateNote(Note) returns (Id);
   rpc UpdateNote(Note) returns (Note);
   rpc DeleteNote(IdSet) returns (IdSet);
 }

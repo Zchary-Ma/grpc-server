@@ -2,7 +2,7 @@ package server
 
 import (
 	"context"
-	"github.com/zchary-ma/pre/pb"
+	pb "github.com/zchary-ma/grpc-server/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -56,9 +56,10 @@ func (s Server) GetNote(ctx context.Context, set *pb.IdSet) (*pb.NoteList, error
 	return list, nil
 }
 
-func (s Server) CreateNote(ctx context.Context, note *pb.Note) (*pb.Note, error) {
-	NoteMap[note.Id] = note
-	return note, nil
+func (s Server) CreateNote(ctx context.Context, note *pb.Note) (*pb.Id, error) {
+	var id = &pb.Id{Id: "xxx"}
+	NoteMap[id.String()] = note
+	return id, nil
 }
 
 func (s Server) UpdateNote(ctx context.Context, note *pb.Note) (*pb.Note, error) {

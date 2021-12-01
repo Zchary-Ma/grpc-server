@@ -3,8 +3,8 @@ package server
 import (
 	"context"
 	"github.com/golang/mock/gomock"
-	"github.com/zchary-ma/pre/mock"
-	"github.com/zchary-ma/pre/pb"
+	"github.com/zchary-ma/grpc-server/mock"
+	pb "github.com/zchary-ma/grpc-server/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"log"
 	"testing"
@@ -14,7 +14,7 @@ import (
 func TestServer_CreateNote(t *testing.T) {
 	startTime := time.Now()
 	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
+	defer ctrl.Finish() // as
 
 	// init mock client
 	mockNoteClient := mock.NewMockNoteServiceClient(ctrl)

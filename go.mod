@@ -1,10 +1,11 @@
-module github.com/zchary-ma/pre
+module github.com/zchary-ma/grpc-server
 
 go 1.17
 
 require (
 	google.golang.org/grpc v1.42.0
 	google.golang.org/protobuf v1.27.1
+	github.com/znkisoft/ztool v0.0.0-20211010033418-cdbda4e9f7ee
 )
 
 require (

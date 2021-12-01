@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/zchary-ma/pre/server"
+	"github.com/zchary-ma/grpc-server/server"
 	"log"
 )
 
