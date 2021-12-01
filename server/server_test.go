@@ -38,8 +38,7 @@ func TestServer_CreateNote(t *testing.T) {
 		UpdatedAt: timestamppb.New(startTime.Add(time.Hour * 2)),
 	}
 
-	mockNoteClient.EXPECT().CreateNote(
-		gomock.Any(), req).Return(&pb.Id{Id: id}, nil)
+	mockNoteClient.EXPECT().CreateNote(gomock.Any(), req).Return(&pb.Id{Id: id}, nil)
 
 	// conn, err := grpc.Dial("50051", grpc.WithInsecure())
 	// if err != nil {
