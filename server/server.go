@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/zchary-ma/pre/pb"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"net"
 	"time"
@@ -79,5 +80,7 @@ func (s *Server) ListenAndServe(port string) error {
 	}
 	srv := grpc.NewServer()
 	pb.RegisterNoteServiceServer(srv, Server{})
+
+	reflection.Register(srv)
 	return srv.Serve(listener)
 }
