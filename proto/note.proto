@@ -3,6 +3,7 @@ syntax = "proto3";
 package proto;
 
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
 
 option go_package = "github.com/zchary-ma/grpc-server/proto";
 
@@ -41,8 +42,13 @@ message User {
   string pwd = 4;
 }
 
+message EmptyRequest {
+  google.protobuf.Empty empty = 1;
+}
+
 service NoteService {
   rpc GetNote(IdSet) returns (NoteList);
+  rpc GetNotes(EmptyRequest) returns (NoteList); // test only
   rpc CreateNote(Note) returns (Id);
   rpc UpdateNote(Note) returns (Note);
   rpc DeleteNote(IdSet) returns (IdSet);

@@ -19,6 +19,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type NoteServiceClient interface {
 	GetNote(ctx context.Context, in *IdSet, opts ...grpc.CallOption) (*NoteList, error)
+	GetNotes(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (*NoteList, error)
 	CreateNote(ctx context.Context, in *Note, opts ...grpc.CallOption) (*Id, error)
 	UpdateNote(ctx context.Context, in *Note, opts ...grpc.CallOption) (*Note, error)
 	DeleteNote(ctx context.Context, in *IdSet, opts ...grpc.CallOption) (*IdSet, error)
@@ -35,6 +36,15 @@ func NewNoteServiceClient(cc grpc.ClientConnInterface) NoteServiceClient {
 func (c *noteServiceClient) GetNote(ctx context.Context, in *IdSet, opts ...grpc.CallOption) (*NoteList, error) {
 	out := new(NoteList)
 	err := c.cc.Invoke(ctx, "/proto.NoteService/GetNote", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *noteServiceClient) GetNotes(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (*NoteList, error) {
+	out := new(NoteList)
+	err := c.cc.Invoke(ctx, "/proto.NoteService/GetNotes", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -73,6 +83,7 @@ func (c *noteServiceClient) DeleteNote(ctx context.Context, in *IdSet, opts ...g
 // for forward compatibility
 type NoteServiceServer interface {
 	GetNote(context.Context, *IdSet) (*NoteList, error)
+	GetNotes(context.Context, *EmptyRequest) (*NoteList, error)
 	CreateNote(context.Context, *Note) (*Id, error)
 	UpdateNote(context.Context, *Note) (*Note, error)
 	DeleteNote(context.Context, *IdSet) (*IdSet, error)
@@ -85,6 +96,9 @@ type UnimplementedNoteServiceServer struct {
 
 func (UnimplementedNoteServiceServer) GetNote(context.Context, *IdSet) (*NoteList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetNote not implemented")
+}
+func (UnimplementedNoteServiceServer) GetNotes(context.Context, *EmptyRequest) (*NoteList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetNotes not implemented")
 }
 func (UnimplementedNoteServiceServer) CreateNote(context.Context, *Note) (*Id, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateNote not implemented")
@@ -122,6 +136,24 @@ func _NoteService_GetNote_Handler(srv interface{}, ctx context.Context, dec func
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(NoteServiceServer).GetNote(ctx, req.(*IdSet))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NoteService_GetNotes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EmptyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NoteServiceServer).GetNotes(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.NoteService/GetNotes",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NoteServiceServer).GetNotes(ctx, req.(*EmptyRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -192,6 +224,10 @@ var NoteService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _NoteService_GetNote_Handler,
 		},
 		{
+			MethodName: "GetNotes",
+			Handler:    _NoteService_GetNotes_Handler,
+		},
+		{
 			MethodName: "CreateNote",
 			Handler:    _NoteService_CreateNote_Handler,
 		},
@@ -205,7 +241,7 @@ var NoteService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "proto/note.proto",
+	Metadata: "note.proto",
 }
 
 // UserServiceClient is the client API for UserService service.
@@ -399,5 +435,5 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "proto/note.proto",
+	Metadata: "note.proto",
 }
