@@ -21,8 +21,8 @@ func NewServer() *Server {
 	var s = &Server{}
 	t := time.Now()
 	NoteMap = map[string]*pb.Note{
-		"1": {
-			Id:    "1",
+		"258b55ff-2405-4e1d-b049-5c53dccd310e": {
+			Id:    "258b55ff-2405-4e1d-b049-5c53dccd310e",
 			Title: "note1",
 			Contents: []*pb.Note_Content{
 				{
@@ -33,8 +33,8 @@ func NewServer() *Server {
 			CreatedAt: timestamppb.New(t), // NOTE timezone? not match with time.Now()
 			UpdatedAt: timestamppb.New(t.Add(time.Hour * 10)),
 		},
-		"2": {
-			Id:    "2",
+		"75361c4d-d351-43fe-96d8-5930e80eebaf": {
+			Id:    "75361c4d-d351-43fe-96d8-5930e80eebaf",
 			Title: "note2",
 			Contents: []*pb.Note_Content{
 				{
@@ -53,6 +53,14 @@ func (s Server) GetNote(ctx context.Context, set *pb.IdSet) (*pb.NoteList, error
 	var list = &pb.NoteList{}
 	for _, id := range set.Ids {
 		list.Notes = append(list.Notes, NoteMap[id])
+	}
+	return list, nil
+}
+
+func (s Server) GetNotes(ctx context.Context, empty *pb.EmptyRequest) (*pb.NoteList, error) {
+	var list = &pb.NoteList{}
+	for note := range NoteMap {
+		list.Notes = append(list.Notes, NoteMap[note])
 	}
 	return list, nil
 }
